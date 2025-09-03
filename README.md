@@ -4,7 +4,11 @@ This is a simple discord bots designed to be used with:
 
 https://github.com/af-inet/PZRconEvents
 
-The behavior of this bot is simply to poll your Project Zomboid RCON server for events, and then publish them to a discord channel.
+## Features
+
+1. poll your Project Zomboid RCON server for events, and then publish them to a discord channel.
+
+2. display the current number of players through the presence and channel topic API
 
 ## Usage
 
