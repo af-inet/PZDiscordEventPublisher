@@ -1,11 +1,9 @@
 {
-  "name": "rcon-flush-bot",
+  "name": "rconevents-discord-publisher",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "start": "deno --allow-all ./src/index.ts",
-    "dev": "ts-node-esm src/index.ts"
+    "start": "deno --allow-env --allow-read --allow-net ./index.ts"
   },
   "dependencies": {
     "discord.js": "^14.16.3",

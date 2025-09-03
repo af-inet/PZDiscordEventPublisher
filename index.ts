@@ -44,7 +44,7 @@ function splitMessage(content: string, maxLen = 1900): string[] {
   return chunks;
 }
 
-function sleep(ms) {
+function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -85,7 +85,7 @@ async function pollOnce(): Promise<void> {
 
     await targetChannel.send(response);
 
-  } catch (err) {
+  } catch (err: any) {
     // It's normal to get poll errors, for example when the server is in "PauseEmpty" mode, it won't respond to RCON events.
     // In this case we can lower the pressure a bit by sleeping for a while.
     if (err.toString().toLowerCase() == "error: connection closed") {
@@ -134,7 +134,7 @@ client.on('error', (e) => {
 });
 
 process.on('SIGINT', async () => {
-  console.log('Shutting down…');
+  console.log('Shutting down...');
   if (timer) clearInterval(timer);
   try { await client.destroy(); } catch {}
   process.exit(0);
