@@ -22,7 +22,7 @@ if (!DISCORD_TOKEN || !DISCORD_CHANNEL_ID || !RCON_HOST || !RCON_PORT || !RCON_P
 }
 
 const POLL_MS = Number(POLL_INTERVAL_MS ?? 10000);
-const COMMAND = 'luacmd rconevents peak';
+const COMMAND = 'luacmd rconevents flush';
 
 // --- Discord client setup ---
 const client = new Client({
