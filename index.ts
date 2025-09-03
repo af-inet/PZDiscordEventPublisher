@@ -44,27 +44,38 @@ function splitMessage(content: string, maxLen = 1900): string[] {
   return chunks;
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Poll once: connect -> send -> post -> close
 async function pollOnce(): Promise<void> {
   // Connect fresh each poll (PZ RCON is often happiest with short-lived sessions)
   let rcon: Rcon | null = null;
   try {
+    console.log(`polling ${RCON_HOST}:${RCON_PORT}`)
     rcon = await Rcon.connect({
       host: RCON_HOST!,
       port: Number(RCON_PORT),
       password: RCON_PASSWORD!,
       // Optional: increase if your server can be slow to respond
-      // timeout: 10000,
+      timeout: 15000,
     });
 
     const response = await rcon.send(COMMAND);
     const trimmed = (response ?? '').trim();
 
     // Nothing to post? (If flush returns empty when no events)
-    if (!trimmed) return;
+    if (!trimmed) {
+        console.log("response empty")
+        return;
+    }
+    if (!targetChannel) {
+        console.log("targetChannel empty")
+        return
+    }
 
-    if (!targetChannel) return;
-
+    console.log("response:")
     console.log(response)
 
     // Ignore if only whitespace or empty
@@ -75,11 +86,20 @@ async function pollOnce(): Promise<void> {
     await targetChannel.send(response);
 
   } catch (err) {
-    console.error('RCON poll error:', err);
-    // Post a brief error notice to the channel (optional; comment out if too noisy)
-    if (targetChannel) {
-      await targetChannel.send(`⚠️ RCON poll failed: \`${(err as Error)?.message ?? String(err)}\``).catch(() => {});
+    // It's normal to get poll errors, for example when the server is in "PauseEmpty" mode, it won't respond to RCON events.
+    // In this case we can lower the pressure a bit by sleeping for a while.
+    if (err.toString().toLowerCase() == "error: connection closed") {
+      console.log('Connection closed.');
+    } else {
+      console.error('RCON poll error:', err);
     }
+    console.log("waiting 1 minute...")
+    await sleep(1000 * 60);
+    
+    // TODO: we might want to catch different errors and report them to discord.
+    // if (targetChannel) {
+    //   await targetChannel.send(`⚠️ RCON poll failed: \`${(err as Error)?.message ?? String(err)}\``).catch(() => {});
+    // }
   } finally {
     try {
       await rcon?.end();
